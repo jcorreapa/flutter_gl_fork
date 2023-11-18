@@ -1,19 +1,15 @@
 import 'dart:ffi';
 import 'dart:io';
 import 'dart:typed_data';
+
 import 'package:ffi/ffi.dart';
 import 'package:flutter_gl/native-array/index.dart';
-import 'package:flutter_gl/openGL/opengl/OpenGLContextDesktop.dart';
 
 import 'OpenGL30Constant.dart';
 import 'opengl_es_bindings/src/gles_bindings.dart';
 
 getContext(Map<String, dynamic> parameters) {
-  if (Platform.isWindows) {
-    return OpenGLContextDesktop(parameters);
-  } else {
-    return OpenGLContextES(parameters);
-  }
+  return OpenGLContextES(parameters);
 }
 
 class OpenGLContextES extends OpenGL30Constant {
@@ -124,19 +120,29 @@ class OpenGLContextES extends OpenGL30Constant {
     return gl.glTexParameteri(v0, v1, v2);
   }
 
-  void texImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type,
-     NativeArray? data) {
+  void texImage2D(int target, int level, int internalformat, int width,
+      int height, int border, int format, int type, NativeArray? data) {
     return gl.glTexImage2D(target, level, internalformat, width, height, border,
         format, type, (data?.data ?? nullptr).cast<Void>());
   }
 
-  void texImage2D_NOSIZE(int target, int level, int internalformat, int format, int type, NativeArray data) {
-    return gl.texImage2D(target, level, internalformat, format, type,
-        data.data.cast<Void>());
+  void texImage2D_NOSIZE(int target, int level, int internalformat, int format,
+      int type, NativeArray data) {
+    return gl.texImage2D(
+        target, level, internalformat, format, type, data.data.cast<Void>());
   }
 
-  void texImage3D(int target, int level, int internalformat, int width, int height,
-      int depth, int border, int format, int type, NativeArray data) {
+  void texImage3D(
+      int target,
+      int level,
+      int internalformat,
+      int width,
+      int height,
+      int depth,
+      int border,
+      int format,
+      int type,
+      NativeArray data) {
     gl.glTexImage3D(target, level, internalformat, width, height, depth, border,
         format, type, data.data.cast<Void>());
   }
@@ -221,10 +227,10 @@ class OpenGLContextES extends OpenGL30Constant {
     return gl.glClearColor(r, g, b, a);
   }
 
-  void compressedTexImage2D(
-      int target, int level, int internalformat, int width, int height, int border, int imageSize, NativeArray data) {
-    return gl.texImage2D(
-        target, level, internalformat, width, height, border, imageSize, data.data.cast<Void>());
+  void compressedTexImage2D(int target, int level, int internalformat,
+      int width, int height, int border, int imageSize, NativeArray data) {
+    return gl.texImage2D(target, level, internalformat, width, height, border,
+        imageSize, data.data.cast<Void>());
   }
 
   void generateMipmap(int v0) {
@@ -352,7 +358,8 @@ class OpenGLContextES extends OpenGL30Constant {
     return gl.glBufferData(target, size, getData(data).cast<Void>(), usage);
   }
 
-  void bufferSubData(int target, int offset, NativeArray data, int srcOffset, int length) {
+  void bufferSubData(
+      int target, int offset, NativeArray data, int srcOffset, int length) {
     gl.glBufferSubData(target, offset, length, data.data.cast<Void>());
   }
 
@@ -383,22 +390,23 @@ class OpenGLContextES extends OpenGL30Constant {
     return gl.glFramebufferTexture2D(v0, v1, v2, v3, v4);
   }
 
-  void readPixels(int x, int y, int width, int height, int format, int type, NativeArray data) {
+  void readPixels(int x, int y, int width, int height, int format, int type,
+      NativeArray data) {
     // if (data is NativeArray) {
-      readPixelsNative(x, y, width, height, format, type, data.data.cast<Void>());
+    readPixelsNative(x, y, width, height, format, type, data.data.cast<Void>());
     // } else {
     //   readPixelsNormal(x, y, width, height, format, type, data);
     // }
   }
 
-  void readPixelsNative(int x, int y, int width, int height, int format, int type,
-      NativeArray data) {
+  void readPixelsNative(int x, int y, int width, int height, int format,
+      int type, NativeArray data) {
     final dataPtr = data.data;
     gl.glReadPixels(x, y, width, height, format, type, dataPtr);
   }
 
-  void readPixelsNormal(int x, int y, int width, int height, int format, int type,
-      Uint8List data) {
+  void readPixelsNormal(int x, int y, int width, int height, int format,
+      int type, Uint8List data) {
     final dataPtr = toPointer(data);
     gl.glReadPixels(x, y, width, height, format, type, dataPtr);
     Uint8List _data = (dataPtr as Pointer<Uint8>).asTypedList(data.length);
@@ -406,20 +414,32 @@ class OpenGLContextES extends OpenGL30Constant {
     calloc.free(dataPtr);
   }
 
-  void copyTexImage2D(int target, int level, int internalformat, int x, int y, int width, int height, int border) {
+  void copyTexImage2D(int target, int level, int internalformat, int x, int y,
+      int width, int height, int border) {
     return gl.glCopyTexImage2D(
         target, level, internalformat, x, y, width, height, border);
   }
 
-  void texSubImage2D(int target, int level, int x, int y, int width, int height, int format, int type, NativeArray data) {
-    gl.glTexSubImage2D(
-        target, level, x, y, width, height, format, type, data.data.cast<Void>());
+  void texSubImage2D(int target, int level, int x, int y, int width, int height,
+      int format, int type, NativeArray data) {
+    gl.glTexSubImage2D(target, level, x, y, width, height, format, type,
+        data.data.cast<Void>());
   }
 
-  void texSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth,
-      format, type, pixels) {
-    return gl.glTexSubImage3D(target, level, xoffset, yoffset, zoffset, width.toInt(),
-        height.toInt(), depth, format, type, getData(pixels).cast<Void>());
+  void texSubImage3D(target, level, xoffset, yoffset, zoffset, width, height,
+      depth, format, type, pixels) {
+    return gl.glTexSubImage3D(
+        target,
+        level,
+        xoffset,
+        yoffset,
+        zoffset,
+        width.toInt(),
+        height.toInt(),
+        depth,
+        format,
+        type,
+        getData(pixels).cast<Void>());
   }
 
   void compressedTexSubImage2D(target, level, xoffset, yoffset, width, height,
@@ -775,7 +795,8 @@ class OpenGLContextES extends OpenGL30Constant {
   }
 
   void uniform4fv(location, NativeArray value) {
-    return gl.glUniform4fv(location, value.length ~/ 4, value.data.cast<Void>());
+    return gl.glUniform4fv(
+        location, value.length ~/ 4, value.data.cast<Void>());
   }
 
   void uniform4f(location, num v0, num v1, num v2, num v3) {
@@ -795,11 +816,13 @@ class OpenGLContextES extends OpenGL30Constant {
     return gl.glFinish();
   }
 
-  void texStorage2D(int target, int levels, int internalformat, int width, int height) {
+  void texStorage2D(
+      int target, int levels, int internalformat, int width, int height) {
     return gl.glTexStorage2D(target, levels, internalformat, width, height);
   }
 
-  void texStorage3D(target, levels, internalformat, int width, int height, depth) {
+  void texStorage3D(
+      target, levels, internalformat, int width, int height, depth) {
     return gl.glTexStorage3D(
         target, levels, internalformat, width, height, depth);
   }
@@ -815,23 +838,27 @@ class OpenGLContextES extends OpenGL30Constant {
     calloc.free(vPointer);
     return _v;
   }
+
   bindTransformFeedback(target, transformFeedback) {
     return gl.glBindTransformFeedback(target, transformFeedback);
   }
+
   transformFeedbackVaryings(program, count, List<String> varyings, bufferMode) {
     final varyingsPtr = calloc<Pointer<Int8>>(varyings.length);
 
     int i = 0;
-    for(final varying in varyings) {
+    for (final varying in varyings) {
       varyingsPtr[i] = varying.toNativeUtf8().cast<Int8>();
       i = i + 1;
     }
 
-    final result = gl.glTransformFeedbackVaryings(program, count, varyingsPtr, bufferMode);
+    final result =
+        gl.glTransformFeedbackVaryings(program, count, varyingsPtr, bufferMode);
     calloc.free(varyingsPtr);
 
     return result;
   }
+
   deleteTransformFeedback(int transformFeedback) {
     var _list = [transformFeedback];
     final ptr = calloc<Int32>(_list.length);
@@ -839,21 +866,27 @@ class OpenGLContextES extends OpenGL30Constant {
     gl.glDeleteTransformFeedbacks(1, ptr);
     calloc.free(ptr);
   }
+
   isTransformFeedback(transformFeedback) {
     return gl.glIsTransformFeedback(transformFeedback);
   }
+
   beginTransformFeedback(primitiveMode) {
     return gl.glBeginTransformFeedback(primitiveMode);
   }
+
   endTransformFeedback() {
     return gl.glEndTransformFeedback();
   }
+
   pauseTransformFeedback() {
     return gl.glPauseTransformFeedback();
   }
+
   resumeTransformFeedback() {
     return gl.glResumeTransformFeedback();
   }
+
   getTransformFeedbackVarying(program, index) {
     int maxLen = 100;
     var length = calloc<Int32>();
@@ -861,7 +894,8 @@ class OpenGLContextES extends OpenGL30Constant {
     var type = calloc<Uint32>();
     var name = calloc<Int8>(maxLen);
 
-    gl.glGetTransformFeedbackVarying(program, index, maxLen - 1, length, size, type, name);
+    gl.glGetTransformFeedbackVarying(
+        program, index, maxLen - 1, length, size, type, name);
 
     int _type = type.value;
     String _name = name.cast<Utf8>().toDartString();
@@ -875,7 +909,6 @@ class OpenGLContextES extends OpenGL30Constant {
 
     return ActiveInfo(_type, _name, _size);
   }
-
 
   void invalidateFramebuffer(target, attachments) {
     // TODO  Failed to lookup symbol 'glInvalidateFramebuffer'
